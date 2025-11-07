@@ -1,41 +1,63 @@
 const { constants } = require("../constants");
 
 const errorHandler = (err, req, res, next) => {
-  console.log("calleds");
   const statusCode = res.statusCode ? res.statusCode : 500;
+
   switch (statusCode) {
     case constants.VALIDATION_ERROR:
-      res.json({
+      res.status(statusCode).json({
+        success: false,
+        code: statusCode,
         title: "Validation Failed",
         message: err.message,
-        stackTrace: err.stack,
+        errors: err.errors || [],
+        stack: process.env.NODE_ENV === "production" ? null : err.stack,
       });
       break;
     case constants.SERVER_ERROR:
-      res.json({
+      res.status(statusCode).json({
+        success: false,
+        code: statusCode,
         title: "Server Error",
         message: err.message,
-        stackTrace: err.stack,
+        stack: process.env.NODE_ENV === "production" ? null : err.stack,
       });
+      break;
     case constants.NOT_FOUND:
-      res.json({
-        title: "Not Found Error",
+      res.status(statusCode).json({
+        success: false,
+        code: statusCode,
+        title: "Not Found",
         message: err.message,
-        stackTrace: err.stack,
+        stack: process.env.NODE_ENV === "production" ? null : err.stack,
       });
+      break;
     case constants.UNAUTHORIZED:
-      res.json({
+      res.status(statusCode).json({
+        success: false,
+        code: statusCode,
         title: "Unauthorized",
         message: err.message,
-        stackTrace: err.stack,
+        stack: process.env.NODE_ENV === "production" ? null : err.stack,
       });
+      break;
     case constants.FORBIDDEN:
-      res.json({
+      res.status(statusCode).json({
+        success: false,
+        code: statusCode,
         title: "Forbidden",
         message: err.message,
-        stackTrace: err.stack,
+        stack: process.env.NODE_ENV === "production" ? null : err.stack,
       });
+      break;
     default:
+      res.status(500).json({
+        success: false,
+        code: 500,
+        title: "Internal Server Error",
+        message: "Something went wrong",
+        stack: process.env.NODE_ENV === "production" ? null : err.stack,
+      });
       break;
   }
 };
